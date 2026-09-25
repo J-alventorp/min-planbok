@@ -105,15 +105,20 @@ export function useActiveBudget(state, setState, budgetId) {
       writePeriod({ ...period, categoryBudgets: { ...period.categoryBudgets, [categoryId]: amount } });
     },
 
-    logExpense: (categoryId, amount, note) => {
+    logExpense: (categoryId, title, amount, note) => {
       const oldPercent = categoryPercent(period, categoryId);
-      const tx = { id: makeId('tx'), categoryId, amount, note: note || '', date: new Date().toISOString() };
+      const tx = {
+        id: makeId('tx'), categoryId, title: (title || '').trim(), amount, note: note || '', date: new Date().toISOString(),
+      };
       const nextPeriod = { ...period, transactions: [...(period.transactions || []), tx] };
       const newPercent = categoryPercent(nextPeriod, categoryId);
       const situation = detectCrossedSituation(oldPercent, newPercent);
       writePeriod(nextPeriod);
       setMotivation({ situation: situation || 'logged', nonce: Date.now(), subtle: !situation });
       return situation;
+    },
+    updateTransaction: (txId, patch) => {
+      writePeriod({ ...period, transactions: period.transactions.map((t) => (t.id === txId ? { ...t, ...patch } : t)) });
     },
     removeTransaction: (txId) => {
       writePeriod({ ...period, transactions: period.transactions.filter((t) => t.id !== txId) });

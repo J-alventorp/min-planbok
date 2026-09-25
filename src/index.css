@@ -206,6 +206,10 @@ button:focus-visible, input:focus-visible, select:focus-visible{
 .mp-cat-add-row select{ flex:0 0 auto; width:56px; }
 
 /* CATEGORY GRID */
+.mp-cat-grid-head{
+  font-size:12.5px; font-weight:700; color:var(--cream-dim);
+  padding:0 4px;
+}
 .mp-cat-grid{ display:flex; flex-direction:column; gap:10px; }
 .mp-cat-card{
   background:var(--card);
@@ -214,15 +218,32 @@ button:focus-visible, input:focus-visible, select:focus-visible{
   padding:14px;
   display:flex; flex-direction:column; gap:8px;
 }
+.mp-cat-card-tap{
+  background:none; border:none; padding:0; margin:0; width:100%;
+  display:flex; flex-direction:column; gap:8px; text-align:left; cursor:pointer;
+}
+.mp-cat-card-tap:active{ opacity:.8; }
 .mp-cat-card-head{ display:flex; align-items:center; gap:8px; }
 .mp-cat-icon{ font-size:20px; }
-.mp-cat-name{ font-family:var(--font-display); font-weight:700; font-size:15px; }
+.mp-cat-name{ font-family:var(--font-display); font-weight:700; font-size:15px; flex:1; min-width:0; }
 .mp-cat-amounts{ display:flex; align-items:baseline; gap:8px; }
 .mp-cat-spent{ font-family:var(--font-display); font-weight:700; font-size:16px; }
 .mp-cat-of{ font-size:12px; color:var(--cream-dim); }
 .mp-cat-input{
   width:80px; background:var(--bg-alt); border:1.5px solid var(--ring); color:var(--cream);
   padding:6px 10px; border-radius:999px; font-size:13px; font-weight:700;
+}
+.mp-cat-slider{
+  width:100%; appearance:none; -webkit-appearance:none; height:4px; border-radius:999px;
+  background:var(--ring); outline:none; margin:2px 0 0;
+}
+.mp-cat-slider::-webkit-slider-thumb{
+  -webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%;
+  background:var(--accent); border:2px solid var(--surface); cursor:pointer;
+}
+.mp-cat-slider::-moz-range-thumb{
+  width:18px; height:18px; border-radius:50%;
+  background:var(--accent); border:2px solid var(--surface); cursor:pointer;
 }
 
 /* PROGRESS BAR */
@@ -318,6 +339,35 @@ button:focus-visible, input:focus-visible, select:focus-visible{
   box-shadow:0 3px 0 #c88813;
 }
 .mp-primary-btn:active{ transform:translateY(2px); box-shadow:none; }
+button.mp-danger-btn{
+  background:var(--red); color:#fff; border:none; border-radius:999px;
+  padding:11px; font-weight:800; font-size:14px; font-family:var(--font-display);
+  box-shadow:0 3px 0 #a02e24;
+}
+button.mp-danger-btn:active{ transform:translateY(2px); box-shadow:none; }
+
+/* CATEGORY DETAIL MODAL — choice step */
+.mp-choice-row{ display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+.mp-choice-btn{
+  background:var(--card); border:1.5px solid var(--ring); color:var(--cream);
+  border-radius:var(--radius-md); padding:16px; text-align:left;
+  font-family:var(--font-display); font-weight:700; font-size:15px;
+}
+.mp-choice-btn:active{ opacity:.85; }
+
+/* CATEGORY DETAIL MODAL — transaction list */
+.mp-tx-list{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+.mp-tx-row{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--bg-alt); border:1px solid var(--ring); border-radius:var(--radius-md);
+  padding:10px 14px; text-align:left; color:var(--cream);
+}
+.mp-tx-info{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+.mp-tx-title{ font-weight:700; font-size:14px; }
+.mp-tx-note{ font-size:12px; color:var(--cream-dim); }
+.mp-tx-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:2px; flex:0 0 auto; }
+.mp-tx-amount{ font-weight:800; font-family:var(--font-display); font-size:14px; }
+.mp-tx-date{ font-size:11px; color:var(--cream-dim); }
 
 /* MOTIVATIONAL TOAST */
 .mp-motivation{
@@ -360,7 +410,20 @@ button:focus-visible, input:focus-visible, select:focus-visible{
   position:absolute; top:16px; right:16px;
   background:none; border:none; color:var(--cream); font-size:18px;
 }
+.mp-modal-back{
+  position:absolute; top:14px; left:16px;
+  background:none; border:none; color:var(--cream); font-size:24px; line-height:1;
+  padding:2px 6px;
+}
 .mp-modal-form{ display:flex; flex-direction:column; gap:14px; margin-top:14px; }
+.mp-modal > form,
+.mp-modal > .mp-primary-btn,
+.mp-modal > .mp-danger-btn,
+.mp-modal > .mp-tx-list,
+.mp-modal > .mp-empty-hint{
+  margin-top:14px;
+}
+.mp-modal > .mp-tx-list + .mp-primary-btn{ margin-top:12px; }
 .mp-modal-form label{
   display:flex; flex-direction:column; gap:6px; font-size:12.5px; font-weight:700; color:var(--cream-dim);
 }
@@ -389,6 +452,18 @@ button:focus-visible, input:focus-visible, select:focus-visible{
   background:var(--bg-alt); border:1.5px solid var(--ring); color:var(--cream);
   padding:10px 14px; border-radius:999px; font-size:14px; font-weight:600; width:100%;
 }
+
+/* PERIOD SUMMARY */
+.mp-summary-stats{ display:flex; flex-direction:column; gap:6px; }
+.mp-summary-row{
+  display:flex; justify-content:space-between; font-size:13px; font-weight:700;
+  color:var(--cream-dim);
+}
+.mp-summary-row span:last-child{ color:var(--cream); }
+.mp-summary-cats{ display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+.mp-summary-cat-row{ display:flex; align-items:center; gap:8px; }
+.mp-summary-cat-row .mp-cat-name{ flex:0 0 auto; max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.mp-summary-cat-bar{ flex:1; min-width:0; }
 
 @media (prefers-reduced-motion: reduce){
   .mp-bar-fill{ transition:none; }
