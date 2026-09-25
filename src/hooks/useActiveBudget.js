@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { currentPeriodKey, shiftPeriodKey } from '../utils/period';
 import { createPeriod, categoryPercent, previousPeriodEndSituation } from '../utils/calc';
 import { detectCrossedSituation } from '../utils/motivational';
+import { fireThresholdNotification } from '../utils/notify';
 import { makeId } from '../utils/id';
 
 export function useActiveBudget(state, setState, budgetId) {
@@ -25,6 +26,17 @@ export function useActiveBudget(state, setState, budgetId) {
     const endSituation = previousPeriodEndSituation(budget, todayKey);
     const isFirstPeriod = Object.keys(budget.periods).length === 0;
     const newPeriod = createPeriod(budget, todayKey);
+    const recurringTxs = (budget.recurringTransactions || [])
+      .filter((rt) => rt.active)
+      .map((rt) => ({
+        id: `rtx_${rt.id}_${todayKey}`,
+        categoryId: rt.categoryId,
+        title: rt.title,
+        amount: rt.amount,
+        note: '',
+        date: new Date().toISOString(),
+      }));
+    newPeriod.transactions = [...newPeriod.transactions, ...recurringTxs];
     setState((prev) => ({
       ...prev,
       budgets: prev.budgets.map((b) => (b.id === budgetId && !b.periods[todayKey]
@@ -131,6 +143,44 @@ export function useActiveBudget(state, setState, budgetId) {
       writeBudget({ ...budget, savings: (budget.savings || []).filter((v) => v.id !== id) });
     },
 
+    addRecurringTransaction: (categoryId, title, amount) => {
+      const rt = {
+        id: makeId('rt'), categoryId, title: title.trim(), amount, active: true,
+      };
+      writeBudget({ ...budget, recurringTransactions: [...(budget.recurringTransactions || []), rt] });
+    },
+    updateRecurringTransaction: (id, patch) => {
+      writeBudget({
+        ...budget,
+        recurringTransactions: (budget.recurringTransactions || []).map((rt) => (rt.id === id ? { ...rt, ...patch } : rt)),
+      });
+    },
+    removeRecurringTransaction: (id) => {
+      writeBudget({
+        ...budget,
+        recurringTransactions: (budget.recurringTransactions || []).filter((rt) => rt.id !== id),
+      });
+    },
+
+    addGoal: (name, icon, targetAmount) => {
+      const g = {
+        id: makeId('goal'), name: name.trim(), icon, targetAmount, savedAmount: 0, active: true,
+      };
+      writeBudget({ ...budget, goals: [...(budget.goals || []), g] });
+    },
+    updateGoal: (id, patch) => {
+      writeBudget({ ...budget, goals: (budget.goals || []).map((g) => (g.id === id ? { ...g, ...patch } : g)) });
+    },
+    removeGoal: (id) => {
+      writeBudget({ ...budget, goals: (budget.goals || []).filter((g) => g.id !== id) });
+    },
+    contributeToGoal: (id, amount) => {
+      writeBudget({
+        ...budget,
+        goals: (budget.goals || []).map((g) => (g.id === id ? { ...g, savedAmount: Math.max(0, (g.savedAmount || 0) + amount) } : g)),
+      });
+    },
+
     addCategory: (name, icon) => {
       writeBudget({ ...budget, categories: [...budget.categories, { id: makeId('cat'), name, icon }] });
     },
@@ -152,6 +202,10 @@ export function useActiveBudget(state, setState, budgetId) {
       const situation = detectCrossedSituation(oldPercent, newPercent);
       writePeriod(nextPeriod);
       setMotivation({ situation: situation || 'logged', nonce: Date.now(), subtle: !situation });
+      if (situation === 'nearLimit' || situation === 'hitLimit' || situation === 'overBudget') {
+        const category = budget.categories.find((c) => c.id === categoryId);
+        fireThresholdNotification(situation, category?.name);
+      }
       return situation;
     },
     updateTransaction: (txId, patch) => {

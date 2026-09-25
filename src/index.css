@@ -68,7 +68,13 @@ button:focus-visible, input:focus-visible, select:focus-visible{
 }
 
 /* HEADER */
-.mp-header{ text-align:center; padding-top:4px; }
+.mp-header{ text-align:center; padding-top:4px; position:relative; }
+.mp-settings-btn{
+  position:absolute; top:0; right:4px;
+  background:var(--surface); border:1.5px solid var(--ring); color:var(--cream);
+  width:34px; height:34px; border-radius:50%; font-size:16px;
+  display:flex; align-items:center; justify-content:center;
+}
 .mp-brand{
   font-family:var(--font-display);
   font-weight:800;
@@ -465,6 +471,17 @@ button.mp-danger-btn:active{ transform:translateY(2px); box-shadow:none; }
 .mp-summary-cat-row{ display:flex; align-items:center; gap:8px; }
 .mp-summary-cat-row .mp-cat-name{ flex:0 0 auto; max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .mp-summary-cat-bar{ flex:1; min-width:0; }
+
+/* SETTINGS MODAL */
+.mp-settings-section{ display:flex; flex-direction:column; gap:8px; margin-top:16px; }
+.mp-settings-section:first-of-type{ margin-top:14px; }
+.mp-settings-heading{ font-family:var(--font-display); font-weight:700; font-size:14px; margin:0; }
+
+/* TREND CHART */
+.mp-trend-chart{ width:100%; height:140px; display:block; }
+.mp-trend-bar{ fill:var(--ring); }
+.mp-trend-bar--current{ fill:var(--accent); }
+.mp-trend-label{ font-size:9px; font-weight:700; fill:var(--cream-dim); font-family:var(--font-body); }
 
 @media (prefers-reduced-motion: reduce){
   .mp-bar-fill{ transition:none; }

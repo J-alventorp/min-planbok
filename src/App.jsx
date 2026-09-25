@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocalStorageState } from './hooks/useLocalStorageState';
+import { useTheme } from './hooks/useTheme';
 import BudgetTabs from './components/BudgetTabs';
 import NewBudgetModal from './components/NewBudgetModal';
 import BudgetView from './components/BudgetView';
+import SettingsModal from './components/SettingsModal';
+import QuickLogModal from './components/QuickLogModal';
 import { makeId } from './utils/id';
 import { defaultCategories } from './data/defaultCategories';
 import { defaultFixedExpenses } from './data/defaultFixedExpenses';
@@ -11,9 +14,27 @@ function defaultState() {
   return { budgets: [], activeBudgetId: null };
 }
 
+function readQuicklogParam() {
+  try {
+    return new URLSearchParams(window.location.search).get('quicklog') === '1';
+  } catch (e) {
+    return false;
+  }
+}
+
 export default function App() {
   const [state, setState] = useLocalStorageState('mp_state', defaultState);
+  const [theme, setTheme] = useTheme();
   const [showNewBudget, setShowNewBudget] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showQuickLog, setShowQuickLog] = useState(readQuicklogParam);
+
+  useEffect(() => {
+    if (!showQuickLog) return;
+    const url = new URL(window.location.href);
+    url.searchParams.delete('quicklog');
+    window.history.replaceState({}, '', url);
+  }, [showQuickLog]);
 
   const createBudget = ({ name, currency, periodType, color }) => {
     const budget = {
@@ -26,6 +47,8 @@ export default function App() {
       fixedExpenses: defaultFixedExpenses(),
       loans: [],
       savings: [],
+      goals: [],
+      recurringTransactions: [],
       periods: {},
     };
     setState((prev) => ({
@@ -40,10 +63,21 @@ export default function App() {
   const activeId = state.activeBudgetId && state.budgets.some((b) => b.id === state.activeBudgetId)
     ? state.activeBudgetId
     : state.budgets[0]?.id;
+  const activeBudget = state.budgets.find((b) => b.id === activeId) || null;
 
   return (
     <div className="mp-app">
       <header className="mp-header">
+        {!needsOnboarding && (
+          <button
+            type="button"
+            className="mp-settings-btn"
+            onClick={() => setShowSettings(true)}
+            aria-label="Inställningar"
+          >
+            ⚙️
+          </button>
+        )}
         <h1 className="mp-brand">Min <span>Plånbok</span></h1>
         <p className="mp-tagline">Koll på pengarna, utan tråkigheten</p>
       </header>
@@ -66,6 +100,25 @@ export default function App() {
           canClose={!needsOnboarding}
           onClose={() => setShowNewBudget(false)}
           onCreate={createBudget}
+        />
+      )}
+
+      {showSettings && (
+        <SettingsModal
+          state={state}
+          setState={setState}
+          theme={theme}
+          setTheme={setTheme}
+          onClose={() => setShowSettings(false)}
+        />
+      )}
+
+      {showQuickLog && activeBudget && (
+        <QuickLogModal
+          budgetId={activeId}
+          state={state}
+          setState={setState}
+          onClose={() => setShowQuickLog(false)}
         />
       )}
 

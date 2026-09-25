@@ -1,4 +1,5 @@
 import { computeSuggestions } from './suggestions';
+import { previousPeriodKeys } from './period';
 
 export function categoryTransactions(period, categoryId) {
   return (period?.transactions || []).filter((t) => t.categoryId === categoryId);
@@ -88,6 +89,28 @@ export function createPeriod(budget, periodKey) {
     suggestions,
     suggestionsApplied: false,
   };
+}
+
+// Spend per period across the last `count` periods (oldest first) plus the
+// current one, for the trend chart. categoryId is optional — omit it for
+// total spend across all categories.
+export function spendHistory(budget, periodKey, count, categoryId) {
+  const keys = [...previousPeriodKeys(budget.periodType, periodKey, count).reverse(), periodKey];
+  return keys.map((key) => {
+    const period = budget.periods[key];
+    const spent = categoryId
+      ? categorySpent(period, categoryId)
+      : totalSpent(period);
+    return { key, spent };
+  });
+}
+
+export function totalGoalsSaved(budget) {
+  return (budget?.goals || []).reduce((s, g) => s + (g.savedAmount || 0), 0);
+}
+
+export function totalGoalsTarget(budget) {
+  return (budget?.goals || []).reduce((s, g) => s + (g.targetAmount || 0), 0);
 }
 
 export function previousPeriodEndSituation(budget, periodKey) {

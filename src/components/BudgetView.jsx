@@ -11,6 +11,9 @@ import CategoryDetailModal from './CategoryDetailModal';
 import PeriodSummary from './PeriodSummary';
 import SuggestionBanner from './SuggestionBanner';
 import MotivationalMessage from './MotivationalMessage';
+import GoalsList from './GoalsList';
+import RecurringTransactionManager from './RecurringTransactionManager';
+import TrendChart from './TrendChart';
 import {
   totalFixedExpenses, totalLoans, totalSavings, freeToAllocate, categoryTransactions,
 } from '../utils/calc';
@@ -98,6 +101,16 @@ export default function BudgetView({ state, setState, budgetId }) {
         />
       )}
 
+      {section === 'savings' && (
+        <GoalsList
+          goals={budget.goals || []}
+          currency={budget.currency}
+          onAdd={actions.addGoal}
+          onContribute={actions.contributeToGoal}
+          onRemove={actions.removeGoal}
+        />
+      )}
+
       {section === 'categories' && (
         <>
           {showSuggestions && (
@@ -127,7 +140,20 @@ export default function BudgetView({ state, setState, budgetId }) {
             onAdd={actions.addCategory}
             onRemove={actions.removeCategory}
           />
+
+          <RecurringTransactionManager
+            items={budget.recurringTransactions || []}
+            categories={budget.categories}
+            currency={budget.currency}
+            onAdd={actions.addRecurringTransaction}
+            onUpdate={actions.updateRecurringTransaction}
+            onRemove={actions.removeRecurringTransaction}
+          />
         </>
+      )}
+
+      {section === 'trends' && (
+        <TrendChart budget={budget} periodKey={viewKey} currency={budget.currency} />
       )}
 
       <PeriodSummary budget={budget} period={period} periodKey={viewKey} />

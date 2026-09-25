@@ -3,6 +3,7 @@ const SECTIONS = [
   { id: 'loans', label: 'Lån & Avbetalningar' },
   { id: 'savings', label: 'Spar & Investeringar' },
   { id: 'categories', label: 'Rörliga kostnader' },
+  { id: 'trends', label: 'Trender' },
 ];
 
 export default function SectionTabs({ active, onChange }) {

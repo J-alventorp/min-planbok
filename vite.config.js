@@ -27,6 +27,14 @@ export default defineConfig({
         icons: [
           { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
         ],
+        shortcuts: [
+          {
+            name: 'Logga utgift',
+            short_name: 'Logga',
+            url: '/min-planbok/?quicklog=1',
+            icons: [{ src: 'icon.svg', sizes: 'any', type: 'image/svg+xml' }],
+          },
+        ],
       },
     }),
   ],
