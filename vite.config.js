@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  base: '/min-planbok/',
   server: {
     port: Number(process.env.PORT) || 5173,
     strictPort: true,
@@ -16,8 +17,8 @@ export default defineConfig({
         name: 'Min Plånbok',
         short_name: 'Plånbok',
         description: 'Koll på pengarna, utan tråkigheten.',
-        start_url: '/',
-        scope: '/',
+        start_url: '/min-planbok/',
+        scope: '/min-planbok/',
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#0E1F22',
