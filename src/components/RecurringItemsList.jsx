@@ -2,7 +2,10 @@ import { useState } from 'react';
 import FixedExpenseRow from './FixedExpenseRow';
 import { formatMoney } from '../utils/money';
 
-export default function FixedExpensesList({ expenses, currency, onAdd, onUpdate, onRemove }) {
+export default function RecurringItemsList({
+  title, items, currency, onAdd, onUpdate, onRemove,
+  emptyHint, namePlaceholder, totalLabel,
+}) {
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
 
@@ -14,16 +17,16 @@ export default function FixedExpensesList({ expenses, currency, onAdd, onUpdate,
     setAmount('');
   };
 
-  const total = expenses.filter((f) => f.active).reduce((s, f) => s + f.amount, 0);
+  const total = items.filter((f) => f.active).reduce((s, f) => s + f.amount, 0);
 
   return (
     <section className="mp-card">
-      <h2 className="mp-card-title">Fasta utgifter</h2>
-      {expenses.length === 0 ? (
-        <p className="mp-empty-hint">Inga fasta utgifter ännu, t.ex. hyra eller el.</p>
+      <h2 className="mp-card-title">{title}</h2>
+      {items.length === 0 ? (
+        <p className="mp-empty-hint">{emptyHint}</p>
       ) : (
         <div className="mp-fixed-list">
-          {expenses.map((f) => (
+          {items.map((f) => (
             <FixedExpenseRow
               key={f.id}
               expense={f}
@@ -35,12 +38,12 @@ export default function FixedExpensesList({ expenses, currency, onAdd, onUpdate,
         </div>
       )}
       <form className="mp-add-row" onSubmit={submit}>
-        <input placeholder="Namn, t.ex. Hyra" value={name} onChange={(e) => setName(e.target.value)} />
+        <input placeholder={namePlaceholder} value={name} onChange={(e) => setName(e.target.value)} />
         <input type="number" placeholder="Belopp" min="0" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <button type="submit">Lägg till</button>
       </form>
-      {expenses.length > 0 && (
-        <p className="mp-fixed-total">Totalt fasta utgifter: {formatMoney(total, currency)}</p>
+      {items.length > 0 && (
+        <p className="mp-fixed-total">{totalLabel}: {formatMoney(total, currency)}</p>
       )}
     </section>
   );

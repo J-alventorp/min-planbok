@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useActiveBudget } from '../hooks/useActiveBudget';
 import PeriodHeader from './PeriodHeader';
 import IncomeCard from './IncomeCard';
-import FixedExpensesList from './FixedExpensesList';
+import RecurringItemsList from './RecurringItemsList';
+import SectionTabs from './SectionTabs';
 import CategoryBudgetGrid from './CategoryBudgetGrid';
 import AddExpenseForm from './AddExpenseForm';
 import CategoryManager from './CategoryManager';
@@ -10,17 +11,22 @@ import CategoryDetailModal from './CategoryDetailModal';
 import PeriodSummary from './PeriodSummary';
 import SuggestionBanner from './SuggestionBanner';
 import MotivationalMessage from './MotivationalMessage';
-import { totalFixedExpenses, freeToAllocate, categoryTransactions } from '../utils/calc';
+import {
+  totalFixedExpenses, totalLoans, totalSavings, freeToAllocate, categoryTransactions,
+} from '../utils/calc';
 
 export default function BudgetView({ state, setState, budgetId }) {
   const {
     budget, period, viewKey, todayKey, motivation, clearMotivation, actions,
   } = useActiveBudget(state, setState, budgetId);
   const [detailCategoryId, setDetailCategoryId] = useState(null);
+  const [section, setSection] = useState('fixed');
 
   if (!budget || !period) return null;
 
   const fixedTotal = totalFixedExpenses(period);
+  const loansTotal = totalLoans(period);
+  const savingsTotal = totalSavings(period);
   const free = freeToAllocate(period);
   const showSuggestions = period.suggestions
     && !period.suggestionsApplied
@@ -38,49 +44,91 @@ export default function BudgetView({ state, setState, budgetId }) {
         onToday={actions.goToday}
       />
 
-      {showSuggestions && (
-        <SuggestionBanner
-          suggestions={period.suggestions}
-          categories={budget.categories}
-          currency={budget.currency}
-          onApplyAll={() => actions.applySuggestions()}
-          onApplyOne={(id) => actions.applySuggestions([id])}
-          onDismiss={actions.dismissSuggestions}
-        />
-      )}
-
       <IncomeCard
         income={period.income}
         currency={budget.currency}
         fixedTotal={fixedTotal}
+        loansTotal={loansTotal}
+        savingsTotal={savingsTotal}
         freeToAllocate={free}
         onChange={actions.setIncome}
       />
 
-      <FixedExpensesList
-        expenses={budget.fixedExpenses}
-        currency={budget.currency}
-        onAdd={actions.addFixedExpense}
-        onUpdate={actions.updateFixedExpense}
-        onRemove={actions.removeFixedExpense}
-      />
+      <SectionTabs active={section} onChange={setSection} />
 
-      <CategoryBudgetGrid
-        categories={budget.categories}
-        period={period}
-        currency={budget.currency}
-        freeToAllocate={free}
-        onChangeBudget={actions.setCategoryBudget}
-        onOpenDetail={setDetailCategoryId}
-      />
+      {section === 'fixed' && (
+        <RecurringItemsList
+          title="Fasta utgifter"
+          items={budget.fixedExpenses}
+          currency={budget.currency}
+          onAdd={actions.addFixedExpense}
+          onUpdate={actions.updateFixedExpense}
+          onRemove={actions.removeFixedExpense}
+          emptyHint="Inga fasta utgifter ännu, t.ex. hyra eller el."
+          namePlaceholder="Namn, t.ex. Hyra"
+          totalLabel="Totalt fasta utgifter"
+        />
+      )}
 
-      <AddExpenseForm categories={budget.categories} onLog={actions.logExpense} />
+      {section === 'loans' && (
+        <RecurringItemsList
+          title="Lån och avbetalningar"
+          items={budget.loans || []}
+          currency={budget.currency}
+          onAdd={actions.addLoan}
+          onUpdate={actions.updateLoan}
+          onRemove={actions.removeLoan}
+          emptyHint="Inga lån eller avbetalningar ännu."
+          namePlaceholder="Namn, t.ex. Billån"
+          totalLabel="Totalt lån och avbetalningar"
+        />
+      )}
 
-      <CategoryManager
-        categories={budget.categories}
-        onAdd={actions.addCategory}
-        onRemove={actions.removeCategory}
-      />
+      {section === 'savings' && (
+        <RecurringItemsList
+          title="Spar och investeringar"
+          items={budget.savings || []}
+          currency={budget.currency}
+          onAdd={actions.addSavings}
+          onUpdate={actions.updateSavings}
+          onRemove={actions.removeSavings}
+          emptyHint="Inget sparande eller investeringar ännu."
+          namePlaceholder="Namn, t.ex. Fondsparande"
+          totalLabel="Totalt spar och investeringar"
+        />
+      )}
+
+      {section === 'categories' && (
+        <>
+          {showSuggestions && (
+            <SuggestionBanner
+              suggestions={period.suggestions}
+              categories={budget.categories}
+              currency={budget.currency}
+              onApplyAll={() => actions.applySuggestions()}
+              onApplyOne={(id) => actions.applySuggestions([id])}
+              onDismiss={actions.dismissSuggestions}
+            />
+          )}
+
+          <CategoryBudgetGrid
+            categories={budget.categories}
+            period={period}
+            currency={budget.currency}
+            freeToAllocate={free}
+            onChangeBudget={actions.setCategoryBudget}
+            onOpenDetail={setDetailCategoryId}
+          />
+
+          <AddExpenseForm categories={budget.categories} onLog={actions.logExpense} />
+
+          <CategoryManager
+            categories={budget.categories}
+            onAdd={actions.addCategory}
+            onRemove={actions.removeCategory}
+          />
+        </>
+      )}
 
       <PeriodSummary budget={budget} period={period} periodKey={viewKey} />
 

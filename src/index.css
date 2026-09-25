@@ -103,6 +103,7 @@ button:focus-visible, input:focus-visible, select:focus-visible{
   white-space:nowrap;
 }
 .mp-tab.active{ color:var(--accent-ink); }
+.mp-section-tabs .mp-tab.active{ background:var(--accent); border-color:var(--accent); }
 .mp-tab-new{
   font-size:16px; font-weight:800; padding:9px 14px;
 }

@@ -5,6 +5,7 @@ import NewBudgetModal from './components/NewBudgetModal';
 import BudgetView from './components/BudgetView';
 import { makeId } from './utils/id';
 import { defaultCategories } from './data/defaultCategories';
+import { defaultFixedExpenses } from './data/defaultFixedExpenses';
 
 function defaultState() {
   return { budgets: [], activeBudgetId: null };
@@ -22,7 +23,9 @@ export default function App() {
       currency,
       periodType,
       categories: defaultCategories(),
-      fixedExpenses: [],
+      fixedExpenses: defaultFixedExpenses(),
+      loans: [],
+      savings: [],
       periods: {},
     };
     setState((prev) => ({

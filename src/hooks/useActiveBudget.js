@@ -36,19 +36,32 @@ export function useActiveBudget(state, setState, budgetId) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [budgetId, todayKey, periodKeysSignature]);
 
-  // Keep the live (today) period's fixed-expense snapshot synced to the
-  // template while it's still in progress — past periods stay frozen.
+  // Keep the live (today) period's fixed-expense/loan/savings snapshots
+  // synced to their templates while it's still in progress — past periods
+  // stay frozen.
   useEffect(() => {
     if (!budget || viewKey !== todayKey) return;
     const period = budget.periods[todayKey];
     if (!period) return;
-    const active = budget.fixedExpenses.filter((f) => f.active);
-    const changed = active.length !== period.fixedExpenseSnapshot.length
-      || active.some((f) => {
-        const snap = period.fixedExpenseSnapshot.find((s) => s.id === f.id);
-        return !snap || snap.amount !== f.amount || snap.name !== f.name;
+
+    const buildSnap = (list) => (list || [])
+      .filter((x) => x.active)
+      .map((x) => ({ id: x.id, name: x.name, amount: x.amount }));
+    const activeFixed = buildSnap(budget.fixedExpenses);
+    const activeLoans = buildSnap(budget.loans);
+    const activeSavings = buildSnap(budget.savings);
+
+    const snapChanged = (snap, active) => active.length !== (snap || []).length
+      || active.some((x) => {
+        const s = (snap || []).find((s) => s.id === x.id);
+        return !s || s.amount !== x.amount || s.name !== x.name;
       });
+
+    const changed = snapChanged(period.fixedExpenseSnapshot, activeFixed)
+      || snapChanged(period.loanSnapshot, activeLoans)
+      || snapChanged(period.savingsSnapshot, activeSavings);
     if (!changed) return;
+
     setState((prev) => ({
       ...prev,
       budgets: prev.budgets.map((b) => (b.id === budgetId
@@ -58,14 +71,16 @@ export function useActiveBudget(state, setState, budgetId) {
             ...b.periods,
             [todayKey]: {
               ...b.periods[todayKey],
-              fixedExpenseSnapshot: active.map((f) => ({ id: f.id, name: f.name, amount: f.amount })),
+              fixedExpenseSnapshot: activeFixed,
+              loanSnapshot: activeLoans,
+              savingsSnapshot: activeSavings,
             },
           },
         }
         : b)),
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [budget?.fixedExpenses, viewKey, todayKey, budgetId]);
+  }, [budget?.fixedExpenses, budget?.loans, budget?.savings, viewKey, todayKey, budgetId]);
 
   // Falls back to a virtual (unsaved) period for display when navigating to
   // a period that hasn't been written yet — first mutation persists it.
@@ -92,6 +107,28 @@ export function useActiveBudget(state, setState, budgetId) {
     },
     removeFixedExpense: (id) => {
       writeBudget({ ...budget, fixedExpenses: budget.fixedExpenses.filter((f) => f.id !== id) });
+    },
+
+    addLoan: (name, amount) => {
+      const l = { id: makeId('loan'), name, amount, active: true };
+      writeBudget({ ...budget, loans: [...(budget.loans || []), l] });
+    },
+    updateLoan: (id, patch) => {
+      writeBudget({ ...budget, loans: (budget.loans || []).map((l) => (l.id === id ? { ...l, ...patch } : l)) });
+    },
+    removeLoan: (id) => {
+      writeBudget({ ...budget, loans: (budget.loans || []).filter((l) => l.id !== id) });
+    },
+
+    addSavings: (name, amount) => {
+      const v = { id: makeId('sav'), name, amount, active: true };
+      writeBudget({ ...budget, savings: [...(budget.savings || []), v] });
+    },
+    updateSavings: (id, patch) => {
+      writeBudget({ ...budget, savings: (budget.savings || []).map((v) => (v.id === id ? { ...v, ...patch } : v)) });
+    },
+    removeSavings: (id) => {
+      writeBudget({ ...budget, savings: (budget.savings || []).filter((v) => v.id !== id) });
     },
 
     addCategory: (name, icon) => {

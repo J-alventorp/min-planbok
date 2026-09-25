@@ -2,7 +2,7 @@ import ProgressBar from './ProgressBar';
 import { periodLabel } from '../utils/period';
 import {
   totalFixedExpenses, totalCategoryBudgets, totalSpent, totalRemaining, freeToAllocate,
-  categorySpent, categoryBudgetAmount,
+  categorySpent, categoryBudgetAmount, totalLoans, totalSavings,
 } from '../utils/calc';
 import { formatMoney } from '../utils/money';
 
@@ -20,6 +20,14 @@ export default function PeriodSummary({ budget, period, periodKey }) {
         <div className="mp-summary-row">
           <span>Fasta utgifter</span>
           <span>{formatMoney(totalFixedExpenses(period), budget.currency)}</span>
+        </div>
+        <div className="mp-summary-row">
+          <span>Lån och avbetalningar</span>
+          <span>{formatMoney(totalLoans(period), budget.currency)}</span>
+        </div>
+        <div className="mp-summary-row">
+          <span>Spar och investeringar</span>
+          <span>{formatMoney(totalSavings(period), budget.currency)}</span>
         </div>
         <div className="mp-summary-row">
           <span>Budgeterat totalt</span>

@@ -1,6 +1,8 @@
 import { formatMoney } from '../utils/money';
 
-export default function IncomeCard({ income, currency, fixedTotal, freeToAllocate, onChange }) {
+export default function IncomeCard({
+  income, currency, fixedTotal, loansTotal, savingsTotal, freeToAllocate, onChange,
+}) {
   return (
     <section className="mp-card mp-income-card">
       <h2 className="mp-card-title">Inkomst</h2>
@@ -17,6 +19,8 @@ export default function IncomeCard({ income, currency, fixedTotal, freeToAllocat
       </div>
       <div className="mp-income-stats">
         <span>Fasta utgifter: {formatMoney(fixedTotal, currency)}</span>
+        <span>Lån och avbetalningar: {formatMoney(loansTotal, currency)}</span>
+        <span>Spar och investeringar: {formatMoney(savingsTotal, currency)}</span>
         <span className={freeToAllocate < 0 ? 'mp-negative' : ''}>
           Kvar att fördela: {formatMoney(freeToAllocate, currency)}
         </span>

@@ -27,6 +27,14 @@ export function totalFixedExpenses(period) {
   return (period?.fixedExpenseSnapshot || []).reduce((s, f) => s + f.amount, 0);
 }
 
+export function totalLoans(period) {
+  return (period?.loanSnapshot || []).reduce((s, l) => s + l.amount, 0);
+}
+
+export function totalSavings(period) {
+  return (period?.savingsSnapshot || []).reduce((s, v) => s + v.amount, 0);
+}
+
 export function totalCategoryBudgets(period) {
   return Object.values(period?.categoryBudgets || {}).reduce((s, v) => s + v, 0);
 }
@@ -36,7 +44,8 @@ export function totalSpent(period) {
 }
 
 export function freeToAllocate(period) {
-  return (period?.income || 0) - totalFixedExpenses(period) - totalCategoryBudgets(period);
+  return (period?.income || 0) - totalFixedExpenses(period) - totalLoans(period)
+    - totalSavings(period) - totalCategoryBudgets(period);
 }
 
 export function totalRemaining(period) {
@@ -55,12 +64,26 @@ export function createPeriod(budget, periodKey) {
   const fixedExpenseSnapshot = budget.fixedExpenses
     .filter((f) => f.active)
     .map((f) => ({ id: f.id, name: f.name, amount: f.amount }));
+  const loanSnapshot = (budget.loans || [])
+    .filter((l) => l.active)
+    .map((l) => ({ id: l.id, name: l.name, amount: l.amount }));
+  const savingsSnapshot = (budget.savings || [])
+    .filter((v) => v.active)
+    .map((v) => ({ id: v.id, name: v.name, amount: v.amount }));
   const fixedTotal = fixedExpenseSnapshot.reduce((s, f) => s + f.amount, 0);
   const suggestions = computeSuggestions(budget, periodKey, { income, fixedTotal });
+  const categoryIds = new Set(budget.categories.map((c) => c.id));
+  const categoryBudgets = lastPeriod
+    ? Object.fromEntries(
+      Object.entries(lastPeriod.categoryBudgets || {}).filter(([id]) => categoryIds.has(id)),
+    )
+    : {};
   return {
     income,
-    categoryBudgets: {},
+    categoryBudgets,
     fixedExpenseSnapshot,
+    loanSnapshot,
+    savingsSnapshot,
     transactions: [],
     suggestions,
     suggestionsApplied: false,
