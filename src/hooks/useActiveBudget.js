@@ -4,6 +4,7 @@ import { createPeriod, categoryPercent, previousPeriodEndSituation } from '../ut
 import { detectCrossedSituation } from '../utils/motivational';
 import { fireThresholdNotification } from '../utils/notify';
 import { makeId } from '../utils/id';
+import { PRESET_GOALS } from '../data/goalPresets';
 
 export function useActiveBudget(state, setState, budgetId) {
   const budget = state.budgets.find((b) => b.id === budgetId);
@@ -93,6 +94,37 @@ export function useActiveBudget(state, setState, budgetId) {
     }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [budget?.fixedExpenses, budget?.loans, budget?.savings, viewKey, todayKey, budgetId]);
+
+  // One-time seed: make sure every budget has the two ready-made preset
+  // goals (Buffertspar / Långsiktigt spar), added for budgets created before
+  // this feature existed as well as brand new ones. The "missing" check runs
+  // inside the updater (against the freshest prev state) rather than against
+  // the outer closure, so this stays correct even if the effect fires more
+  // than once (e.g. React StrictMode's double-invoke in development).
+  useEffect(() => {
+    if (!budgetId) return;
+    setState((prev) => ({
+      ...prev,
+      budgets: prev.budgets.map((b) => {
+        if (b.id !== budgetId) return b;
+        const existingKeys = new Set((b.goals || []).map((g) => g.presetKey).filter(Boolean));
+        const missing = PRESET_GOALS.filter((p) => !existingKeys.has(p.presetKey));
+        if (missing.length === 0) return b;
+        const seeded = missing.map((p) => ({
+          id: makeId('goal'),
+          name: p.name,
+          icon: p.icon,
+          description: p.description,
+          presetKey: p.presetKey,
+          targetAmount: p.defaultTarget,
+          savedAmount: 0,
+          active: true,
+        }));
+        return { ...b, goals: [...(b.goals || []), ...seeded] };
+      }),
+    }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [budgetId]);
 
   // Falls back to a virtual (unsaved) period for display when navigating to
   // a period that hasn't been written yet — first mutation persists it.

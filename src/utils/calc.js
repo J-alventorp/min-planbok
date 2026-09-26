@@ -53,6 +53,13 @@ export function totalRemaining(period) {
   return totalCategoryBudgets(period) - totalSpent(period);
 }
 
+// All money that has gone out this period so far: committed fixed costs,
+// loans and savings plus whatever's been logged in categories — used to
+// track running spend against the income cap.
+export function totalOutflow(period) {
+  return totalFixedExpenses(period) + totalLoans(period) + totalSavings(period) + totalSpent(period);
+}
+
 // Builds a period that hasn't been persisted yet: snapshots active fixed
 // expenses (so later template edits never rewrite history), carries the
 // previous period's income forward as a starting default, and computes
@@ -103,6 +110,13 @@ export function spendHistory(budget, periodKey, count, categoryId) {
       : totalSpent(period);
     return { key, spent };
   });
+}
+
+// Savings allocation per period across the last `count` periods (oldest
+// first) plus the current one, for the savings trend chart.
+export function savingsHistory(budget, periodKey, count) {
+  const keys = [...previousPeriodKeys(budget.periodType, periodKey, count).reverse(), periodKey];
+  return keys.map((key) => ({ key, saved: totalSavings(budget.periods[key]) }));
 }
 
 export function totalGoalsSaved(budget) {

@@ -4,7 +4,7 @@ import GoalCard from './GoalCard';
 const ICONS = ['🎯', '✈️', '🏖️', '💻', '🚗', '🏡', '🎓', '🎁'];
 
 export default function GoalsList({
-  goals, currency, onAdd, onContribute, onRemove,
+  goals, currency, period, onAdd, onContribute, onRemove,
 }) {
   const [name, setName] = useState('');
   const [icon, setIcon] = useState(ICONS[0]);
@@ -21,6 +21,10 @@ export default function GoalsList({
   return (
     <section className="mp-card">
       <h2 className="mp-card-title">Sparmål</h2>
+      <p className="mp-hint">
+        Kom igång med sparande genom att sätta av lite varje period — även små summor växer med tiden.
+        Använd info-knapparna nedan för tips om buffert- och långsiktigt sparande.
+      </p>
       {goals.length === 0 ? (
         <p className="mp-empty-hint">Inga sparmål ännu, t.ex. en resa eller en buffert.</p>
       ) : (
@@ -30,6 +34,7 @@ export default function GoalsList({
               key={g.id}
               goal={g}
               currency={currency}
+              period={period}
               onContribute={(amount) => onContribute(g.id, amount)}
               onRemove={() => onRemove(g.id)}
             />

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useActiveBudget } from '../hooks/useActiveBudget';
+import { getContrastInk } from '../utils/color';
 import PeriodHeader from './PeriodHeader';
 import IncomeCard from './IncomeCard';
 import RecurringItemsList from './RecurringItemsList';
@@ -24,6 +25,12 @@ export default function BudgetView({ state, setState, budgetId }) {
   } = useActiveBudget(state, setState, budgetId);
   const [detailCategoryId, setDetailCategoryId] = useState(null);
   const [section, setSection] = useState('fixed');
+
+  useEffect(() => {
+    if (!budget?.color) return;
+    document.documentElement.style.setProperty('--accent', budget.color);
+    document.documentElement.style.setProperty('--accent-ink', getContrastInk(budget.color));
+  }, [budget?.color]);
 
   if (!budget || !period) return null;
 
@@ -105,6 +112,7 @@ export default function BudgetView({ state, setState, budgetId }) {
         <GoalsList
           goals={budget.goals || []}
           currency={budget.currency}
+          period={period}
           onAdd={actions.addGoal}
           onContribute={actions.contributeToGoal}
           onRemove={actions.removeGoal}
