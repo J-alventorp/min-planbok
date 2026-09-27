@@ -4,7 +4,7 @@ import { getContrastInk } from '../utils/color';
 import PeriodHeader from './PeriodHeader';
 import IncomeCard from './IncomeCard';
 import RecurringItemsList from './RecurringItemsList';
-import SectionTabs from './SectionTabs';
+import SectionAccordionItem from './SectionAccordionItem';
 import CategoryBudgetGrid from './CategoryBudgetGrid';
 import AddExpenseForm from './AddExpenseForm';
 import CategoryManager from './CategoryManager';
@@ -64,63 +64,58 @@ export default function BudgetView({ state, setState, budgetId }) {
         onChange={actions.setIncome}
       />
 
-      <SectionTabs active={section} onChange={setSection} />
+      <div className="mp-accordion">
+        <SectionAccordionItem id="fixed" label="Fasta utgifter" active={section} onToggle={setSection}>
+          <RecurringItemsList
+            title="Fasta utgifter"
+            items={budget.fixedExpenses}
+            currency={budget.currency}
+            onAdd={actions.addFixedExpense}
+            onUpdate={actions.updateFixedExpense}
+            onRemove={actions.removeFixedExpense}
+            emptyHint="Inga fasta utgifter ännu, t.ex. hyra eller el."
+            namePlaceholder="Namn, t.ex. Hyra"
+            totalLabel="Totalt fasta utgifter"
+          />
+        </SectionAccordionItem>
 
-      {section === 'fixed' && (
-        <RecurringItemsList
-          title="Fasta utgifter"
-          items={budget.fixedExpenses}
-          currency={budget.currency}
-          onAdd={actions.addFixedExpense}
-          onUpdate={actions.updateFixedExpense}
-          onRemove={actions.removeFixedExpense}
-          emptyHint="Inga fasta utgifter ännu, t.ex. hyra eller el."
-          namePlaceholder="Namn, t.ex. Hyra"
-          totalLabel="Totalt fasta utgifter"
-        />
-      )}
+        <SectionAccordionItem id="loans" label="Lån & Avbetalningar" active={section} onToggle={setSection}>
+          <RecurringItemsList
+            title="Lån och avbetalningar"
+            items={budget.loans || []}
+            currency={budget.currency}
+            onAdd={actions.addLoan}
+            onUpdate={actions.updateLoan}
+            onRemove={actions.removeLoan}
+            emptyHint="Inga lån eller avbetalningar ännu."
+            namePlaceholder="Namn, t.ex. Billån"
+            totalLabel="Totalt lån och avbetalningar"
+          />
+        </SectionAccordionItem>
 
-      {section === 'loans' && (
-        <RecurringItemsList
-          title="Lån och avbetalningar"
-          items={budget.loans || []}
-          currency={budget.currency}
-          onAdd={actions.addLoan}
-          onUpdate={actions.updateLoan}
-          onRemove={actions.removeLoan}
-          emptyHint="Inga lån eller avbetalningar ännu."
-          namePlaceholder="Namn, t.ex. Billån"
-          totalLabel="Totalt lån och avbetalningar"
-        />
-      )}
+        <SectionAccordionItem id="savings" label="Spar & Investeringar" active={section} onToggle={setSection}>
+          <RecurringItemsList
+            title="Spar och investeringar"
+            items={budget.savings || []}
+            currency={budget.currency}
+            onAdd={actions.addSavings}
+            onUpdate={actions.updateSavings}
+            onRemove={actions.removeSavings}
+            emptyHint="Inget sparande eller investeringar ännu."
+            namePlaceholder="Namn, t.ex. Fondsparande"
+            totalLabel="Totalt spar och investeringar"
+          />
+          <GoalsList
+            goals={budget.goals || []}
+            currency={budget.currency}
+            period={period}
+            onAdd={actions.addGoal}
+            onContribute={actions.contributeToGoal}
+            onRemove={actions.removeGoal}
+          />
+        </SectionAccordionItem>
 
-      {section === 'savings' && (
-        <RecurringItemsList
-          title="Spar och investeringar"
-          items={budget.savings || []}
-          currency={budget.currency}
-          onAdd={actions.addSavings}
-          onUpdate={actions.updateSavings}
-          onRemove={actions.removeSavings}
-          emptyHint="Inget sparande eller investeringar ännu."
-          namePlaceholder="Namn, t.ex. Fondsparande"
-          totalLabel="Totalt spar och investeringar"
-        />
-      )}
-
-      {section === 'savings' && (
-        <GoalsList
-          goals={budget.goals || []}
-          currency={budget.currency}
-          period={period}
-          onAdd={actions.addGoal}
-          onContribute={actions.contributeToGoal}
-          onRemove={actions.removeGoal}
-        />
-      )}
-
-      {section === 'categories' && (
-        <>
+        <SectionAccordionItem id="categories" label="Rörliga kostnader" active={section} onToggle={setSection}>
           {showSuggestions && (
             <SuggestionBanner
               suggestions={period.suggestions}
@@ -157,12 +152,12 @@ export default function BudgetView({ state, setState, budgetId }) {
             onUpdate={actions.updateRecurringTransaction}
             onRemove={actions.removeRecurringTransaction}
           />
-        </>
-      )}
+        </SectionAccordionItem>
 
-      {section === 'trends' && (
-        <TrendChart budget={budget} periodKey={viewKey} currency={budget.currency} />
-      )}
+        <SectionAccordionItem id="trends" label="Trender" active={section} onToggle={setSection}>
+          <TrendChart budget={budget} periodKey={viewKey} currency={budget.currency} />
+        </SectionAccordionItem>
+      </div>
 
       <PeriodSummary budget={budget} period={period} periodKey={viewKey} />
 

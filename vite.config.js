@@ -22,7 +22,7 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         background_color: '#0E1F22',
-        theme_color: '#FFB833',
+        theme_color: '#5AA9E6',
         lang: 'sv',
         icons: [
           { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },

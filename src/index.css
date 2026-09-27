@@ -7,6 +7,7 @@
   --cream-dim:#9FC1BF;
   --accent:#FFB833;
   --accent-ink:#2A1D00;
+  --brand:#5AA9E6;
   --coral:#FF6F59;
   --green:#4CAF6D;
   --amber:#FFC24B;
@@ -88,7 +89,7 @@ button:focus-visible, input:focus-visible, select:focus-visible{
   margin:0;
   color:var(--cream);
 }
-.mp-brand span{ color:var(--accent); }
+.mp-brand span{ color:var(--brand); }
 .mp-tagline{
   margin:6px 0 0;
   font-size:13.5px;
@@ -120,14 +121,30 @@ button:focus-visible, input:focus-visible, select:focus-visible{
   font-size:16px; font-weight:800; padding:9px 14px;
 }
 
-/* SECTION TABS: stacked vertically instead of a horizontal scroll row */
-.mp-section-tabs{
-  flex-direction:column;
-  overflow-x:visible;
+/* ACCORDION (budget sections) */
+.mp-accordion{ display:flex; flex-direction:column; gap:10px; }
+.mp-accordion-item{ display:flex; flex-direction:column; }
+.mp-accordion-header{
+  display:flex; align-items:center; justify-content:space-between;
+  width:100%; text-align:left;
+  background:var(--surface);
+  border:1.5px solid var(--ring);
+  color:var(--cream);
+  padding:14px 16px;
+  border-radius:var(--radius-md);
+  font-family:var(--font-display);
+  font-weight:700;
+  font-size:15px;
 }
-.mp-section-tabs .mp-tab{
-  width:100%;
-  text-align:left;
+.mp-accordion-header.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:var(--accent-ink);
+}
+.mp-accordion-chevron{ font-size:18px; font-weight:800; line-height:1; }
+.mp-accordion-body{
+  display:flex; flex-direction:column; gap:18px;
+  padding-top:10px;
 }
 
 /* GENERIC CARD */
