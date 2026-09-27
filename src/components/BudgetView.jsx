@@ -25,6 +25,7 @@ export default function BudgetView({ state, setState, budgetId }) {
   } = useActiveBudget(state, setState, budgetId);
   const [detailCategoryId, setDetailCategoryId] = useState(null);
   const [section, setSection] = useState('fixed');
+  const toggleSection = (id) => setSection((cur) => (cur === id ? null : id));
 
   useEffect(() => {
     if (!budget?.color) return;
@@ -65,7 +66,7 @@ export default function BudgetView({ state, setState, budgetId }) {
       />
 
       <div className="mp-accordion">
-        <SectionAccordionItem id="fixed" label="Fasta utgifter" active={section} onToggle={setSection}>
+        <SectionAccordionItem id="fixed" label="Fasta utgifter" active={section} onToggle={toggleSection}>
           <RecurringItemsList
             title="Fasta utgifter"
             items={budget.fixedExpenses}
@@ -79,7 +80,7 @@ export default function BudgetView({ state, setState, budgetId }) {
           />
         </SectionAccordionItem>
 
-        <SectionAccordionItem id="loans" label="Lån & Avbetalningar" active={section} onToggle={setSection}>
+        <SectionAccordionItem id="loans" label="Lån & Avbetalningar" active={section} onToggle={toggleSection}>
           <RecurringItemsList
             title="Lån och avbetalningar"
             items={budget.loans || []}
@@ -93,7 +94,7 @@ export default function BudgetView({ state, setState, budgetId }) {
           />
         </SectionAccordionItem>
 
-        <SectionAccordionItem id="savings" label="Spar & Investeringar" active={section} onToggle={setSection}>
+        <SectionAccordionItem id="savings" label="Spar & Investeringar" active={section} onToggle={toggleSection}>
           <RecurringItemsList
             title="Spar och investeringar"
             items={budget.savings || []}
@@ -115,7 +116,7 @@ export default function BudgetView({ state, setState, budgetId }) {
           />
         </SectionAccordionItem>
 
-        <SectionAccordionItem id="categories" label="Rörliga kostnader" active={section} onToggle={setSection}>
+        <SectionAccordionItem id="categories" label="Rörliga kostnader" active={section} onToggle={toggleSection}>
           {showSuggestions && (
             <SuggestionBanner
               suggestions={period.suggestions}
@@ -154,7 +155,7 @@ export default function BudgetView({ state, setState, budgetId }) {
           />
         </SectionAccordionItem>
 
-        <SectionAccordionItem id="trends" label="Trender" active={section} onToggle={setSection}>
+        <SectionAccordionItem id="trends" label="Trender" active={section} onToggle={toggleSection}>
           <TrendChart budget={budget} periodKey={viewKey} currency={budget.currency} />
         </SectionAccordionItem>
       </div>
