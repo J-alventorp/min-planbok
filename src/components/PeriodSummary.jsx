@@ -15,7 +15,7 @@ export default function PeriodSummary({ budget, period, periodKey }) {
 
   return (
     <section className="mp-card mp-summary-card">
-      <h2 className="mp-card-title">Sammanfattning – {periodLabel(budget.periodType, periodKey)}</h2>
+      <h2 className="mp-card-title">Sammanfattning – {periodLabel(budget.periodType, periodKey, budget.periodStartDay || 1)}</h2>
 
       <ProgressBar spent={outflow} allocated={period.income} currency={budget.currency} />
 

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import PeriodTypeToggle from './PeriodTypeToggle';
+import PeriodStartDayField from './PeriodStartDayField';
 import CurrencySelector from './CurrencySelector';
 
 const COLORS = ['#FFB833', '#FF6F59', '#4CAF6D', '#5AA9E6', '#C77DFF', '#F25C9B'];
@@ -8,12 +9,15 @@ export default function NewBudgetModal({ onCreate, onClose, canClose }) {
   const [name, setName] = useState('');
   const [currency, setCurrency] = useState('SEK');
   const [periodType, setPeriodType] = useState('month');
+  const [periodStartDay, setPeriodStartDay] = useState(1);
   const [color, setColor] = useState(COLORS[0]);
 
   const submit = (e) => {
     e.preventDefault();
     if (!name.trim()) return;
-    onCreate({ name: name.trim(), currency, periodType, color });
+    onCreate({
+      name: name.trim(), currency, periodType, periodStartDay, color,
+    });
   };
 
   return (
@@ -37,6 +41,7 @@ export default function NewBudgetModal({ onCreate, onClose, canClose }) {
             Period
             <PeriodTypeToggle value={periodType} onChange={setPeriodType} />
           </label>
+          <PeriodStartDayField periodType={periodType} value={periodStartDay} onChange={setPeriodStartDay} />
           <div className="mp-color-row">
             {COLORS.map((c) => (
               <button

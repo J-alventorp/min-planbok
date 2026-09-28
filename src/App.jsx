@@ -36,13 +36,16 @@ export default function App() {
     window.history.replaceState({}, '', url);
   }, [showQuickLog]);
 
-  const createBudget = ({ name, currency, periodType, color }) => {
+  const createBudget = ({
+    name, currency, periodType, periodStartDay, color,
+  }) => {
     const budget = {
       id: makeId('budget'),
       name,
       color,
       currency,
       periodType,
+      periodStartDay: periodStartDay || 1,
       categories: defaultCategories(),
       fixedExpenses: defaultFixedExpenses(),
       loans: [],

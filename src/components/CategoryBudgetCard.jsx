@@ -1,11 +1,26 @@
+import { useState } from 'react';
 import ProgressBar from './ProgressBar';
+import { ExpenseFields } from './AddExpenseForm';
 import { formatMoney } from '../utils/money';
 
 export default function CategoryBudgetCard({
-  category, spent, allocated, currency, sliderMax, sliderStep, onChangeBudget, onOpenDetail,
+  category, spent, allocated, currency, onChangeBudget, onOpenDetail, onLog, onRequestRemove,
 }) {
+  const [quickAddOpen, setQuickAddOpen] = useState(false);
+
   return (
     <div className="mp-cat-card">
+      <button
+        type="button"
+        className="mp-cat-card-remove"
+        aria-label={`Ta bort ${category.name}`}
+        onClick={(e) => {
+          e.stopPropagation();
+          onRequestRemove(category.id);
+        }}
+      >
+        ✕
+      </button>
       <button type="button" className="mp-cat-card-tap" onClick={() => onOpenDetail(category.id)}>
         <div className="mp-cat-card-head">
           <span className="mp-cat-icon" aria-hidden="true">{category.icon}</span>
@@ -25,17 +40,24 @@ export default function CategoryBudgetCard({
           placeholder="0"
           onChange={(e) => onChangeBudget(Number(e.target.value) || 0)}
         />
+        <button
+          type="button"
+          className="mp-cat-quickadd-btn"
+          aria-label={`Logga utgift i ${category.name}`}
+          onClick={() => setQuickAddOpen((o) => !o)}
+        >
+          {quickAddOpen ? '−' : '+'}
+        </button>
       </div>
-      <input
-        type="range"
-        className="mp-cat-slider"
-        min="0"
-        max={sliderMax}
-        step={sliderStep}
-        value={Math.min(allocated || 0, sliderMax)}
-        onChange={(e) => onChangeBudget(Number(e.target.value))}
-        aria-label={`Budget för ${category.name}`}
-      />
+
+      {quickAddOpen && (
+        <ExpenseFields
+          categories={[category]}
+          categoryId={category.id}
+          onLog={onLog}
+          onDone={() => setQuickAddOpen(false)}
+        />
+      )}
     </div>
   );
 }

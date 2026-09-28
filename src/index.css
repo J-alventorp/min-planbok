@@ -188,6 +188,7 @@ button:focus-visible, input:focus-visible, select:focus-visible{
 .mp-period-label{
   font-family:var(--font-display); font-weight:700; font-size:15.5px; text-transform:capitalize;
 }
+.mp-period-label-links{ display:flex; align-items:center; gap:10px; }
 .mp-today-link{
   background:none; border:none; color:var(--accent); font-size:11px; font-weight:700;
   text-decoration:underline; padding:0;
@@ -209,7 +210,17 @@ button:focus-visible, input:focus-visible, select:focus-visible{
 /* FIXED EXPENSES */
 .mp-fixed-list{ display:flex; flex-direction:column; gap:8px; }
 .mp-fixed-row{
+  display:flex; flex-direction:column; gap:6px;
+}
+.mp-fixed-row-main{
   display:flex; align-items:center; gap:6px;
+}
+.mp-fixed-row-interval{
+  display:flex; gap:6px; padding-left:32px;
+}
+.mp-fixed-row-interval select, .mp-fixed-row-interval input{
+  background:var(--bg-alt); border:1.5px solid var(--ring); color:var(--cream);
+  padding:6px 10px; border-radius:999px; font-size:12px;
 }
 .mp-fixed-row--inactive{ opacity:.45; }
 .mp-fixed-toggle{
@@ -252,14 +263,19 @@ button:focus-visible, input:focus-visible, select:focus-visible{
 }
 .mp-cat-grid{ display:flex; flex-direction:column; gap:10px; }
 .mp-cat-card{
+  position:relative;
   background:var(--card);
   border:1px solid var(--ring);
   border-radius:var(--radius-md);
   padding:14px;
   display:flex; flex-direction:column; gap:8px;
 }
+.mp-cat-card-remove{
+  position:absolute; top:10px; right:10px; z-index:1;
+  background:none; border:none; color:var(--cream-dim); font-size:14px; padding:4px; line-height:1;
+}
 .mp-cat-card-tap{
-  background:none; border:none; padding:0; margin:0; width:100%;
+  background:none; border:none; padding:0; margin:0; width:100%; padding-right:22px;
   display:flex; flex-direction:column; gap:8px; text-align:left; cursor:pointer;
 }
 .mp-cat-card-tap:active{ opacity:.8; }
@@ -273,17 +289,9 @@ button:focus-visible, input:focus-visible, select:focus-visible{
   width:80px; background:var(--bg-alt); border:1.5px solid var(--ring); color:var(--cream);
   padding:6px 10px; border-radius:999px; font-size:13px; font-weight:700;
 }
-.mp-cat-slider{
-  width:100%; appearance:none; -webkit-appearance:none; height:4px; border-radius:999px;
-  background:var(--ring); outline:none; margin:2px 0 0;
-}
-.mp-cat-slider::-webkit-slider-thumb{
-  -webkit-appearance:none; appearance:none; width:18px; height:18px; border-radius:50%;
-  background:var(--accent); border:2px solid var(--surface); cursor:pointer;
-}
-.mp-cat-slider::-moz-range-thumb{
-  width:18px; height:18px; border-radius:50%;
-  background:var(--accent); border:2px solid var(--surface); cursor:pointer;
+.mp-cat-quickadd-btn{
+  width:26px; height:26px; border-radius:50%; flex:0 0 auto;
+  background:var(--accent); color:var(--accent-ink); border:none; font-size:15px; font-weight:800;
 }
 
 /* PROGRESS BAR */
@@ -489,6 +497,9 @@ button.mp-danger-btn:active{ transform:translateY(2px); box-shadow:none; }
   background:var(--bg-alt); border:1.5px solid var(--ring); color:var(--cream);
   padding:10px 14px; border-radius:999px; font-size:14px; font-weight:600;
 }
+
+.mp-period-startday{ display:flex; flex-direction:column; gap:10px; }
+.mp-period-startday-input input{ width:80px; }
 
 /* TOGGLE (period type) */
 .mp-toggle-row{ display:flex; gap:8px; }

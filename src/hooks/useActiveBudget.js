@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { currentPeriodKey, shiftPeriodKey } from '../utils/period';
-import { createPeriod, categoryPercent, previousPeriodEndSituation } from '../utils/calc';
+import { currentPeriodKey, shiftPeriodKey, monthKey, periodMonthKey } from '../utils/period';
+import {
+  createPeriod, categoryPercent, previousPeriodEndSituation, isFixedExpenseDue,
+} from '../utils/calc';
 import { detectCrossedSituation } from '../utils/motivational';
 import { fireThresholdNotification } from '../utils/notify';
 import { makeId } from '../utils/id';
@@ -8,14 +10,14 @@ import { PRESET_GOALS } from '../data/goalPresets';
 
 export function useActiveBudget(state, setState, budgetId) {
   const budget = state.budgets.find((b) => b.id === budgetId);
-  const todayKey = budget ? currentPeriodKey(budget.periodType) : null;
+  const todayKey = budget ? currentPeriodKey(budget.periodType, new Date(), budget.periodStartDay || 1) : null;
   const [viewKey, setViewKey] = useState(todayKey);
   const [motivation, setMotivation] = useState(null);
 
   useEffect(() => {
     setViewKey(todayKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [budgetId]);
+  }, [budgetId, budget?.periodStartDay]);
 
   const periodKeysSignature = budget ? Object.keys(budget.periods).sort().join(',') : '';
 
@@ -60,7 +62,10 @@ export function useActiveBudget(state, setState, budgetId) {
     const buildSnap = (list) => (list || [])
       .filter((x) => x.active)
       .map((x) => ({ id: x.id, name: x.name, amount: x.amount }));
-    const activeFixed = buildSnap(budget.fixedExpenses);
+    const targetMonthKey = periodMonthKey(budget.periodType, todayKey);
+    const activeFixed = (budget.fixedExpenses || [])
+      .filter((f) => f.active && isFixedExpenseDue(f, targetMonthKey))
+      .map((f) => ({ id: f.id, name: f.name, amount: f.amount }));
     const activeLoans = buildSnap(budget.loans);
     const activeSavings = buildSnap(budget.savings);
 
@@ -143,7 +148,9 @@ export function useActiveBudget(state, setState, budgetId) {
     setIncome: (amount) => writePeriod({ ...period, income: amount }),
 
     addFixedExpense: (name, amount) => {
-      const fe = { id: makeId('fe'), name, amount, active: true };
+      const fe = {
+        id: makeId('fe'), name, amount, active: true, interval: 'monthly', startMonth: monthKey(new Date()),
+      };
       writeBudget({ ...budget, fixedExpenses: [...budget.fixedExpenses, fe] });
     },
     updateFixedExpense: (id, patch) => {
@@ -262,6 +269,8 @@ export function useActiveBudget(state, setState, budgetId) {
       });
     },
     dismissSuggestions: () => writePeriod({ ...period, suggestionsApplied: true }),
+
+    setPeriodStartDay: (day) => writeBudget({ ...budget, periodStartDay: day }),
 
     goPrev: () => setViewKey((k) => shiftPeriodKey(budget.periodType, k, -1)),
     goNext: () => setViewKey((k) => {

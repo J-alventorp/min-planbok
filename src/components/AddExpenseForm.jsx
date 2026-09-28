@@ -1,6 +1,8 @@
 import { useState } from 'react';
 
-function ExpenseFields({ categories, categoryId, onLog, onDone }) {
+export function ExpenseFields({
+  categories, categoryId, onLog, onDone,
+}) {
   const [selectedCategoryId, setSelectedCategoryId] = useState(categoryId || categories[0]?.id || '');
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');

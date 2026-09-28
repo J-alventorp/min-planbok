@@ -33,25 +33,52 @@ function isoWeekKeyFromUTC(utcDate) {
   return `${isoYear}-W${String(week).padStart(2, '0')}`;
 }
 
-export function monthKey(date = new Date()) {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+export function monthKey(date = new Date(), startDay = 1) {
+  let y = date.getFullYear();
+  let m = date.getMonth();
+  if (startDay > 1 && date.getDate() < startDay) {
+    m -= 1;
+    if (m < 0) {
+      m = 11;
+      y -= 1;
+    }
+  }
+  return `${y}-${String(m + 1).padStart(2, '0')}`;
 }
 
 export function isoWeekKey(date = new Date()) {
   return isoWeekKeyFromUTC(toUTCDate(date));
 }
 
-export function currentPeriodKey(periodType, date = new Date()) {
-  return periodType === 'week' ? isoWeekKey(date) : monthKey(date);
+export function currentPeriodKey(periodType, date = new Date(), startDay = 1) {
+  return periodType === 'week' ? isoWeekKey(date) : monthKey(date, startDay);
 }
 
-export function periodLabel(periodType, key) {
+// Maps any period key to the plain calendar month ("YYYY-MM") it falls in,
+// independent of a custom periodStartDay — used to anchor quarterly/half-
+// yearly fixed expenses to real calendar months regardless of period type.
+export function periodMonthKey(periodType, key) {
+  if (periodType !== 'week') return key;
+  const [yStr, wStr] = key.split('-W');
+  const monday = isoWeekMonday(parseInt(yStr, 10), parseInt(wStr, 10));
+  return `${monday.getUTCFullYear()}-${String(monday.getUTCMonth() + 1).padStart(2, '0')}`;
+}
+
+export function periodLabel(periodType, key, startDay = 1) {
   if (periodType === 'week') {
     const [y, w] = key.split('-W');
     return `Vecka ${parseInt(w, 10)}, ${y}`;
   }
-  const [y, m] = key.split('-');
-  return `${MONTHS_SV[parseInt(m, 10) - 1]} ${y}`;
+  const [yStr, mStr] = key.split('-');
+  const y = parseInt(yStr, 10);
+  const m = parseInt(mStr, 10) - 1;
+  if (startDay <= 1) {
+    return `${MONTHS_SV[m]} ${y}`;
+  }
+  const start = new Date(y, m, startDay);
+  const end = new Date(y, m + 1, startDay - 1);
+  const fmt = (d) => `${d.getDate()} ${MONTHS_SV[d.getMonth()].slice(0, 3)}`;
+  return `${fmt(start)} – ${fmt(end)} ${end.getFullYear()}`;
 }
 
 export function shiftPeriodKey(periodType, key, delta) {

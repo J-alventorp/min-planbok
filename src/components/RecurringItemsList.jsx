@@ -4,7 +4,7 @@ import { formatMoney } from '../utils/money';
 
 export default function RecurringItemsList({
   title, items, currency, onAdd, onUpdate, onRemove,
-  emptyHint, namePlaceholder, totalLabel,
+  emptyHint, namePlaceholder, totalLabel, showInterval,
 }) {
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
@@ -31,6 +31,7 @@ export default function RecurringItemsList({
               key={f.id}
               expense={f}
               currency={currency}
+              showInterval={showInterval}
               onUpdate={(patch) => onUpdate(f.id, patch)}
               onRemove={() => onRemove(f.id)}
             />

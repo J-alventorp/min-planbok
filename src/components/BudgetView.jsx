@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { useActiveBudget } from '../hooks/useActiveBudget';
 import { getContrastInk } from '../utils/color';
 import PeriodHeader from './PeriodHeader';
+import BudgetPeriodModal from './BudgetPeriodModal';
 import IncomeCard from './IncomeCard';
 import RecurringItemsList from './RecurringItemsList';
 import SectionAccordionItem from './SectionAccordionItem';
 import CategoryBudgetGrid from './CategoryBudgetGrid';
-import AddExpenseForm from './AddExpenseForm';
 import CategoryManager from './CategoryManager';
 import CategoryDetailModal from './CategoryDetailModal';
 import PeriodSummary from './PeriodSummary';
@@ -25,6 +25,7 @@ export default function BudgetView({ state, setState, budgetId }) {
   } = useActiveBudget(state, setState, budgetId);
   const [detailCategoryId, setDetailCategoryId] = useState(null);
   const [section, setSection] = useState('fixed');
+  const [showPeriodModal, setShowPeriodModal] = useState(false);
   const toggleSection = (id) => setSection((cur) => (cur === id ? null : id));
 
   useEffect(() => {
@@ -49,10 +50,12 @@ export default function BudgetView({ state, setState, budgetId }) {
       <PeriodHeader
         periodType={budget.periodType}
         periodKey={viewKey}
+        periodStartDay={budget.periodStartDay}
         isCurrent={viewKey === todayKey}
         onPrev={actions.goPrev}
         onNext={actions.goNext}
         onToday={actions.goToday}
+        onEditPeriod={() => setShowPeriodModal(true)}
       />
 
       <IncomeCard
@@ -77,6 +80,7 @@ export default function BudgetView({ state, setState, budgetId }) {
             emptyHint="Inga fasta utgifter ännu, t.ex. hyra eller el."
             namePlaceholder="Namn, t.ex. Hyra"
             totalLabel="Totalt fasta utgifter"
+            showInterval
           />
         </SectionAccordionItem>
 
@@ -135,14 +139,12 @@ export default function BudgetView({ state, setState, budgetId }) {
             freeToAllocate={free}
             onChangeBudget={actions.setCategoryBudget}
             onOpenDetail={setDetailCategoryId}
+            onLog={actions.logExpense}
+            onRemoveCategory={actions.removeCategory}
           />
 
-          <AddExpenseForm categories={budget.categories} onLog={actions.logExpense} />
-
           <CategoryManager
-            categories={budget.categories}
             onAdd={actions.addCategory}
-            onRemove={actions.removeCategory}
           />
 
           <RecurringTransactionManager
@@ -171,6 +173,14 @@ export default function BudgetView({ state, setState, budgetId }) {
           onLog={actions.logExpense}
           onUpdate={actions.updateTransaction}
           onRemove={actions.removeTransaction}
+        />
+      )}
+
+      {showPeriodModal && (
+        <BudgetPeriodModal
+          budget={budget}
+          onSave={actions.setPeriodStartDay}
+          onClose={() => setShowPeriodModal(false)}
         />
       )}
 

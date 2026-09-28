@@ -1,5 +1,20 @@
 import { computeSuggestions } from './suggestions';
-import { previousPeriodKeys } from './period';
+import { previousPeriodKeys, periodMonthKey } from './period';
+
+// Whether a fixed expense should appear in the period whose calendar month
+// is targetMonthKey ("YYYY-MM"). Monthly items are always due. Quarterly/
+// half-yearly items are anchored to the calendar month they started in.
+export function isFixedExpenseDue(fe, targetMonthKey) {
+  const interval = fe.interval || 'monthly';
+  if (interval === 'monthly') return true;
+  const start = fe.startMonth || targetMonthKey;
+  const [sy, sm] = start.split('-').map(Number);
+  const [ty, tm] = targetMonthKey.split('-').map(Number);
+  const diff = (ty - sy) * 12 + (tm - sm);
+  if (diff < 0) return false;
+  const n = interval === 'quarterly' ? 3 : 6;
+  return diff % n === 0;
+}
 
 export function categoryTransactions(period, categoryId) {
   return (period?.transactions || []).filter((t) => t.categoryId === categoryId);
@@ -69,8 +84,9 @@ export function createPeriod(budget, periodKey) {
   const lastKey = existingKeys.filter((k) => k < periodKey).pop();
   const lastPeriod = lastKey ? budget.periods[lastKey] : null;
   const income = lastPeriod ? lastPeriod.income : 0;
+  const targetMonthKey = periodMonthKey(budget.periodType, periodKey);
   const fixedExpenseSnapshot = budget.fixedExpenses
-    .filter((f) => f.active)
+    .filter((f) => f.active && isFixedExpenseDue(f, targetMonthKey))
     .map((f) => ({ id: f.id, name: f.name, amount: f.amount }));
   const loanSnapshot = (budget.loans || [])
     .filter((l) => l.active)
