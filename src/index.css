@@ -237,6 +237,9 @@ button:focus-visible, input:focus-visible, select:focus-visible{
   padding:8px 10px; border-radius:999px; font-size:13px;
 }
 .mp-fixed-currency{ font-size:11.5px; color:var(--cream-dim); font-weight:700; flex:0 0 auto; }
+.mp-fixed-detail-toggle{
+  background:none; border:none; color:var(--cream-dim); font-size:13px; flex:0 0 auto; padding:2px;
+}
 .mp-fixed-remove{
   background:none; border:none; color:var(--cream-dim); font-size:15px; flex:0 0 auto; padding:2px;
 }

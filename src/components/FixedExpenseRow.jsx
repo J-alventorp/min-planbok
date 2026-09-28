@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { monthKey } from '../utils/period';
 
 const INTERVALS = [
@@ -9,6 +10,7 @@ const INTERVALS = [
 export default function FixedExpenseRow({
   expense, currency, onUpdate, onRemove, showInterval,
 }) {
+  const [expanded, setExpanded] = useState(false);
   const interval = expense.interval || 'monthly';
   return (
     <div className={`mp-fixed-row ${expense.active ? '' : 'mp-fixed-row--inactive'}`}>
@@ -34,9 +36,19 @@ export default function FixedExpenseRow({
           onChange={(e) => onUpdate({ amount: Number(e.target.value) || 0 })}
         />
         <span className="mp-fixed-currency">{currency}</span>
+        {showInterval && (
+          <button
+            type="button"
+            className="mp-fixed-detail-toggle"
+            aria-label={`${expanded ? 'Dölj' : 'Visa'} intervall för ${expense.name}`}
+            onClick={() => setExpanded((v) => !v)}
+          >
+            {expanded ? '▴' : '▾'}
+          </button>
+        )}
         <button type="button" className="mp-fixed-remove" aria-label="Ta bort" onClick={onRemove}>✕</button>
       </div>
-      {showInterval && (
+      {showInterval && expanded && (
         <div className="mp-fixed-row-interval">
           <select
             aria-label={`Intervall för ${expense.name}`}

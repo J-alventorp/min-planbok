@@ -54,4 +54,11 @@ export const MESSAGES = {
     'Nu kör vi! Din budget är redo.',
     'Fräsch start – fyll på med kategorier och kör igång.',
   ],
+  goalReached: [
+    'Sparmål uppnått! 🎉',
+    'Klart! Du nådde målet – riktigt snyggt jobbat!',
+    'Målet är i hamn! Dags att fira lite.',
+    'Du klarade det! Nästa mål väntar när du är redo.',
+    'Helt fantastiskt – sparmålet är uppfyllt! ✨',
+  ],
 };

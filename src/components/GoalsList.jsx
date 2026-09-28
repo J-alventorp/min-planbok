@@ -26,7 +26,7 @@ export default function GoalsList({
         Använd info-knapparna nedan för tips om buffert- och långsiktigt sparande.
       </p>
       {goals.length === 0 ? (
-        <p className="mp-empty-hint">Inga sparmål ännu, t.ex. en resa eller en buffert.</p>
+        <p className="mp-empty-hint">Inga sparmål ännu — sätt upp ett, även små summor blir till något stort! 🌱</p>
       ) : (
         <div className="mp-cat-grid">
           {goals.map((g) => (

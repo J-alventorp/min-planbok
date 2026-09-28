@@ -214,10 +214,15 @@ export function useActiveBudget(state, setState, budgetId) {
       writeBudget({ ...budget, goals: (budget.goals || []).filter((g) => g.id !== id) });
     },
     contributeToGoal: (id, amount) => {
+      const goal = (budget.goals || []).find((g) => g.id === id);
+      const wasReached = !!goal && goal.targetAmount > 0 && goal.savedAmount >= goal.targetAmount;
+      const nextSaved = goal ? Math.max(0, (goal.savedAmount || 0) + amount) : 0;
+      const nowReached = !!goal && goal.targetAmount > 0 && nextSaved >= goal.targetAmount;
       writeBudget({
         ...budget,
-        goals: (budget.goals || []).map((g) => (g.id === id ? { ...g, savedAmount: Math.max(0, (g.savedAmount || 0) + amount) } : g)),
+        goals: (budget.goals || []).map((g) => (g.id === id ? { ...g, savedAmount: nextSaved } : g)),
       });
+      if (nowReached && !wasReached) setMotivation({ situation: 'goalReached', nonce: Date.now() });
     },
 
     addCategory: (name, icon) => {

@@ -77,7 +77,7 @@ export default function BudgetView({ state, setState, budgetId }) {
             onAdd={actions.addFixedExpense}
             onUpdate={actions.updateFixedExpense}
             onRemove={actions.removeFixedExpense}
-            emptyHint="Inga fasta utgifter ännu, t.ex. hyra eller el."
+            emptyHint="Inga fasta utgifter ännu, t.ex. hyra eller el. Bra koll här ger dig full koll på resten av budgeten!"
             namePlaceholder="Namn, t.ex. Hyra"
             totalLabel="Totalt fasta utgifter"
             showInterval
@@ -92,7 +92,7 @@ export default function BudgetView({ state, setState, budgetId }) {
             onAdd={actions.addLoan}
             onUpdate={actions.updateLoan}
             onRemove={actions.removeLoan}
-            emptyHint="Inga lån eller avbetalningar ännu."
+            emptyHint="Inga lån eller avbetalningar ännu. Skönt läge – eller lägg till om du har något att hålla koll på."
             namePlaceholder="Namn, t.ex. Billån"
             totalLabel="Totalt lån och avbetalningar"
           />
@@ -106,7 +106,7 @@ export default function BudgetView({ state, setState, budgetId }) {
             onAdd={actions.addSavings}
             onUpdate={actions.updateSavings}
             onRemove={actions.removeSavings}
-            emptyHint="Inget sparande eller investeringar ännu."
+            emptyHint="Inget sparande eller investeringar ännu. Varje krona du lägger undan nu gör skillnad sen!"
             namePlaceholder="Namn, t.ex. Fondsparande"
             totalLabel="Totalt spar och investeringar"
           />
